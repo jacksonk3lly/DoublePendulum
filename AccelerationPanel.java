@@ -5,34 +5,51 @@ import java.util.*;
 public class AccelerationPanel extends JPanel {
 
     final int WIDTH = 700;
-    final int HEIGHT = 400;
-    final int MEASURMENTS = 50;
-    public static ArrayList<Integer> list = new ArrayList<Integer>();
+    final int HEIGHT = 200;
+    final static int MEASURMENTS = 100;
+    private static ArrayList<Integer> list1 = new ArrayList<Integer>();
+    private static ArrayList<Integer> list2 = new ArrayList<Integer>();
 
     public AccelerationPanel() {
-        setBackground(Color.blue);
-        setPreferredSize(new Dimension(WIDTH, 500));
+        setBackground(Color.black);
+        setPreferredSize(new Dimension(WIDTH, HEIGHT));
     }
 
-    public void addValue(int value) {
-        list.add(value);
-        if (list.size() > MEASURMENTS) {
-            list.remove(0);
+    public static void addValue1(int value) {
+        list1.add(value);
+        if (list1.size() > MEASURMENTS) {
+            list1.remove(0);
+        }
+    }
+
+    public static void addValue2(int value) {
+        list2.add(value);
+        if (list2.size() > MEASURMENTS) {
+            list2.remove(0);
+        }
+    }
+
+    private void plotList(ArrayList<Integer> list, Graphics g) {
+        for (int i = 1; i < MEASURMENTS; i++) {
+            int step = WIDTH / MEASURMENTS;
+            if (i < list.size()) {
+                if (list.get(i) != null && list.get(i - 1) != null) {
+                    System.out.println(list.get(i));
+                    g.drawLine((i - 1) * step, 100 + list.get(i - 1), i * step, 100 + list.get(i));
+
+                }
+            } else {
+                list.add(null); // Add null value to the ArrayList
+            }
         }
     }
 
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        for (int i = 0; i < MEASURMENTS; i++) {
-            g.setColor(Color.white);
-            int step = WIDTH / MEASURMENTS;
-            if (i < list.size()) {
-                g.setColor(Color.white);
-                g.fillOval(i * step, list.get(i), i, HEIGHT);
-            } else {
-                list.add(null); // Add null value to the ArrayList
-            }
-        }
+        g.setColor(Color.white);
+        plotList(list1, g);
+        g.setColor(Color.pink);
+        plotList(list2, g);
     }
 
 }

@@ -52,6 +52,9 @@ public class Pendulumn {
         theta1 += angularVelocity1;
         theta2 += angularVelocity2;
         refreshPositions();
+        AccelerationPanel.addValue1((int) (angularAcceleration1 * 150));
+        AccelerationPanel.addValue2((int) (angularAcceleration2 * 150));
+        DoublePendulumn.acceleration.repaint();
         hue += 0.01;
     }
 
