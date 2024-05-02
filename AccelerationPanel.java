@@ -6,7 +6,7 @@ public class AccelerationPanel extends JPanel {
 
     final int WIDTH = 700;
     final int HEIGHT = 200;
-    final static int MEASURMENTS = 100;
+    final static int MEASURMENTS = 150;
     private static ArrayList<Integer> list1 = new ArrayList<Integer>();
     private static ArrayList<Integer> list2 = new ArrayList<Integer>();
 
@@ -34,7 +34,6 @@ public class AccelerationPanel extends JPanel {
             int step = WIDTH / MEASURMENTS;
             if (i < list.size()) {
                 if (list.get(i) != null && list.get(i - 1) != null) {
-                    System.out.println(list.get(i));
                     g.drawLine((i - 1) * step, 100 + list.get(i - 1), i * step, 100 + list.get(i));
 
                 }
