@@ -12,8 +12,8 @@ public class Pendulumn {
     double y1;
     double x2;
     double y2;
-    final double l1;
-    final double l2;
+    double l1;
+    double l2;
     double angularVelocity1;
     double angularVelocity2;
     double theta1;
@@ -69,13 +69,13 @@ public class Pendulumn {
     }
 
     public void step(double changeInTime) {
-        double angularAcceleration1 = getAngularAcceleration1() * dampening;
-        double angularAcceleration2 = getAngularAcceleration2() * dampening;
-        angularVelocity1 += angularAcceleration1 * changeInTime;
-        angularVelocity2 += angularAcceleration2 * changeInTime;
+        double angularAcceleration1 = getAngularAcceleration1();
+        double angularAcceleration2 = getAngularAcceleration2();
+        angularVelocity1 += angularAcceleration1 * changeInTime * dampening;
+        angularVelocity2 += angularAcceleration2 * changeInTime * dampening;
         System.out.println("angularVelocity1 " + angularVelocity1 + " angularVelocity2 " + angularVelocity2);
-        theta1 += angularVelocity1 * changeInTime;
-        theta2 += angularVelocity2 * changeInTime;
+        theta1 += angularVelocity1 * changeInTime * dampening;
+        theta2 += angularVelocity2 * changeInTime * dampening;
         AccelerationPanel.addValue1((int) (angularAcceleration1 * 150));
         AccelerationPanel.addValue2((int) (angularAcceleration2 * 150));
         DoublePendulumn.acceleration.repaint();
@@ -96,6 +96,38 @@ public class Pendulumn {
             throw new IllegalArgumentException("y2 is " + (Math.abs(y2 - y0) - (l1 + l2)) + " greater than l1+l2");
         } else if (Math.abs(y2 - y0) < l1 + l2) {
             throw new IllegalArgumentException("y2 is " + ((l1 + l2) - Math.abs(y2 - y0)) + " greater than l1+l2");
+        }
+
+    }
+
+    public void setThetas(double x2, double y2) {
+        // theta2 = Math.asin(y2 / (Math.sqrt(Math.pow(x2, 2) + Math.pow(y2, 2))));
+        // theta2 = Math.PI;
+        // theta1 = Math.asin((x2 - x0 - l2 * Math.sin(theta2)) / l1);
+        // theta1 = Math.asin((x2 - x0 - l2 * Math.sin(theta2)) / l1);
+        // theta1 = Math.asin((x1 - x0) / l1);
+
+        double x = x2 - x0;
+        double y = y2 - y0;
+
+        double d = Math.sqrt(x * x + y * y);
+
+        double a = l1;
+        double c = l2;
+        double b = Math.sqrt(Math.pow((x2 - x0), 2) + Math.pow((y2 - y0), 2));
+
+        double A = Math.acos((a * a - b * b - c * c) / (-2 * b * c));
+        double C = Math.acos((c * c - a * a - b * b) / (-2 * a * b));
+        double L = Math.asin((y2 - y0) / b);
+
+        double w = Math.PI / 2 - L;
+        theta2 = Math.PI / 2 - A - w;
+
+        theta1 = C;
+
+        if (d > l1 + l2 || d < l1 - l2) {
+            System.out.println("d is " + d + " l1+l2 is " + (l1 + l2));
+            return;
         }
 
     }

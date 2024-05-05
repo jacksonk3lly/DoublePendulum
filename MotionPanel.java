@@ -13,7 +13,7 @@ public class MotionPanel extends JPanel {
     public MotionPanel() {
         setBackground(Color.black);
         setPreferredSize(new Dimension(700, 700));
-        pendulumn = new Pendulumn(350, 350, Math.PI, Math.PI / 2, 0, 0, 150, 150, 10, 10, 0.9);
+        pendulumn = new Pendulumn(350, 350, Math.PI, Math.PI / 2, 0, 0, 150, 150, 10, 10, 0.5);
         // one second is 1000 milliseconds
         Timer timer = null;
         int wantedDelay = 1000 / fps;
@@ -33,20 +33,16 @@ public class MotionPanel extends JPanel {
         });
         timer.start();
 
-        // addMouseListener(new MouseAdapter() {
-        // @Override
-        // public void mousePressed(MouseEvent e) {
-        // int y2 = e.getY();
-        // int x2 = e.getX();
-        // int y0 = (int) pendulumn.y0;
-        // int l2 = (int) pendulumn.l2;
-        // Theta1 = Math.arccos(y2 - y0 - l2 * cos(Math.arcsin(x2 - x0 - l1 * sin)));
-        // pendulumn.setTheta1();
-        // pendulumn.setTheta2();
-        // pendulumn.setAngularVelocity1(0);
-        // pendulumn.setAngularVelocity2(0);
-        // }
-        // });
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                int y2 = e.getY();
+                int x2 = e.getX();
+                pendulumn.setThetas(x2, y2);
+                pendulumn.angularVelocity1 = 0;
+                pendulumn.angularVelocity2 = 0;
+            }
+        });
 
     }
 
