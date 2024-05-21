@@ -38,7 +38,8 @@ public class MotionPanel extends JPanel {
             public void mousePressed(MouseEvent e) {
                 int y2 = e.getY();
                 int x2 = e.getX();
-                pendulumn.setThetas(x2, y2);
+
+                pendulumn.setBob2Potition(x2, y2);
                 pendulumn.angularVelocity1 = 0;
                 pendulumn.angularVelocity2 = 0;
             }

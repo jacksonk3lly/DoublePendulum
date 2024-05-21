@@ -21,6 +21,12 @@ public class Pendulumn {
     final double g = 9.8;
     final double dampening;
     float hue = 0f;
+    double paintbobX;
+    double paintbobY;
+    double paintClickX;
+    double paintClickY;
+    double paintM;
+    double paintC;
 
     public Pendulumn(int x0, int y0, double theta1, double theta2, double angularVelocity1, double angularVelocity2,
             double l1, double l2, double m1, double m2, double dampening) {
@@ -53,6 +59,44 @@ public class Pendulumn {
     public void setTheta1(double theta1) {
         this.theta1 = theta1;
         refreshPositions();
+    }
+
+    /*
+     * imagine a circle of radius l1 around (x0, y0)
+     * and a circle of radius l2 around (the given point) the intersection of these
+     * points is a potential position for bob1
+     * 
+     * equation for circle 1: (x-x0)^2 + (y-y0)^2 = l1^2
+     * 
+     * equation for circle 2: (x-xn)^2 + (y-yn)^2 = l2^2
+     * 
+     * found thier intesection with help from this video
+     * 
+     * https://www.youtube.com/watch?v=K8AfRtfwEdc
+     * 
+     * 
+     */
+    public void setBob2Potition(int xn, int yn) {
+        // equation of line which cuts through the circles intersection
+
+        double m = (xn - x0) / (y0 - yn);
+        double c = (x0 * x0 + y0 * y0 + l2 * l2 - (xn * xn + yn * yn + l1 * l1)) / (2 * (y0 - yn));
+        double A = 1 + m * m;
+        double B = 2 * (m * (c - y0) - x0);
+        double C = x0 * x0 + Math.pow(c - y0, 2) - l1 * l1;
+
+        // bob one x position using quadratic formula
+        // only need one solution so just take positive root
+        double X = (-B + Math.sqrt(B * B - 4 * A * C)) / (2 * A);
+        double Y = m * X + c;
+        paintbobX = X;
+        paintbobY = Y;
+        paintClickX = xn;
+        paintM = m;
+        paintC = c;
+        paintClickY = yn;
+        theta1 = Math.atan((X - x0) / (Y - y0));
+        theta2 = Math.atan((x2 - X) / (y2 - Y));
     }
 
     public void setTheta2(double theta2) {
@@ -132,12 +176,27 @@ public class Pendulumn {
 
     }
 
+    /*
+     * method which draws the pendulumn
+     * 
+     * @param Graphics object
+     * 
+     */
     public void draw(Graphics g) {
         g.setColor(Color.getHSBColor(hue, 1f, 1f));
         g.drawLine((int) x0, (int) y0, (int) x1, (int) y1);
         g.fillOval((int) x1 - 5, (int) y1 - 5, 10, 10);
         g.drawLine((int) x1, (int) y1, (int) x2, (int) y2);
         g.fillOval((int) x2 - 5, (int) y2 - 5, 10, 10);
+        g.setColor(Color.red);
+        g.fillOval((int) paintbobX, (int) paintbobY, 10, 10);
+        g.setColor(Color.green);
+        g.drawOval((int) (x0 - l1), (int) (y0 - l1), (int) l1 * 2, (int) l1 * 2);
+        g.drawOval((int) (paintClickX - l2), (int) (paintClickY - l2), (int) l2 * 2, (int) l2 * 2);
+        g.setColor(Color.getHSBColor(hue, 1f, 1f));
+        int xa = 0;
+        int xb = 900;
+        g.drawLine((int) xa, (int) paintM * xa + (int) paintC, (int) xb, (int) paintM * xb + (int) paintC);
     }
 
     public double getAngularAcceleration1() {
