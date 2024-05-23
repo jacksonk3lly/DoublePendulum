@@ -9,7 +9,7 @@ import java.awt.Graphics;
 import java.awt.Point;
 
 /**
- * The Pendulumn class represents a double pendulum system.
+ * The Pendulum class represents a double pendulum system.
  * It calculates the positions and movements of the pendulum bobs based on given
  * parameters.
  * The class also provides methods to set and retrieve the positions and
@@ -19,7 +19,7 @@ import java.awt.Point;
  * The class also provides a method to draw the pendulum system on a graphics
  * object.
  */
-public class Pendulumn {
+public class Pendulum {
 
     /*
      * Inner class to populate the trail queue
@@ -68,7 +68,7 @@ public class Pendulumn {
     double paintM;
     double paintC;
 
-    public Pendulumn(int x0, int y0, double theta1, double theta2, double angularVelocity1, double angularVelocity2,
+    public Pendulum(int x0, int y0, double theta1, double theta2, double angularVelocity1, double angularVelocity2,
             double l1, double l2, int m1, int m2, double dampening) {
         this.x0 = x0;
         this.y0 = y0;
@@ -182,7 +182,7 @@ public class Pendulumn {
         theta2 += angularVelocity2 * changeInTime * dampening;
         AccelerationPanel.addValue1((int) (angularAcceleration1 * 150));
         AccelerationPanel.addValue2((int) (angularAcceleration2 * 150));
-        DoublePendulumn.acceleration.repaint();
+        DoublePendulum.acceleration.repaint();
         refreshPositions();
         addToTrail((int) x2, (int) y2, hue);
     }
@@ -207,7 +207,7 @@ public class Pendulumn {
     }
 
     /*
-     * method which draws the pendulumn
+     * method which draws the pendulum
      * 
      * @param Graphics object
      * 
@@ -240,7 +240,7 @@ public class Pendulumn {
             g.fillOval(point.x, point.y, point.width, point.width);
             trailBrightness += endBrightness / trail.size();
         }
-        // pendulumn
+        // pendulum
         g.setColor(Color.getHSBColor(hue, 1f, 1f));
         // l1
         g.drawLine((int) x0, (int) y0, (int) x1, (int) y1);

@@ -1,7 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 
-public class DoublePendulumn {
+public class DoublePendulum {
 
     static AccelerationPanel acceleration;
     static JFrame frame = new JFrame();

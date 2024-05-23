@@ -4,7 +4,7 @@ import java.util.*;
 
 public class AccelerationPanel extends JPanel {
 
-    final int WIDTH = DoublePendulumn.frame.getWidth();
+    final int WIDTH = DoublePendulum.frame.getWidth();
     final int HEIGHT = 200;
     final static int MEASURMENTS = 150;
     private static ArrayList<Integer> list1 = new ArrayList<Integer>();
