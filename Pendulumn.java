@@ -39,7 +39,8 @@ public class Pendulumn {
     }
 
     public Deque<TrailPoint> trail = new LinkedList<TrailPoint>();
-    int trailLength = 200;
+    static int maxLength = 170;
+    int trailLength = 300;
     boolean hasClicked = false;
     double origionalShade = 50;
     double shade = origionalShade;
@@ -179,7 +180,6 @@ public class Pendulumn {
         angularVelocity2 += angularAcceleration2 * changeInTime * dampening;
         theta1 += angularVelocity1 * changeInTime * dampening;
         theta2 += angularVelocity2 * changeInTime * dampening;
-        System.out.println("changed");
         AccelerationPanel.addValue1((int) (angularAcceleration1 * 150));
         AccelerationPanel.addValue2((int) (angularAcceleration2 * 150));
         DoublePendulumn.acceleration.repaint();

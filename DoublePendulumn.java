@@ -3,7 +3,7 @@ import java.awt.*;
 
 public class DoublePendulumn {
 
-    static AccelerationPanel acceleration = new AccelerationPanel();
+    static AccelerationPanel acceleration;
     static JFrame frame = new JFrame();
     static MotionPanel panel = new MotionPanel();
 
@@ -12,11 +12,13 @@ public class DoublePendulumn {
         frame.setLayout(new BorderLayout());
 
         frame.setBackground(Color.black);
-        frame.add(panel, BorderLayout.CENTER);
-        frame.add(acceleration, BorderLayout.SOUTH);
         frame.add(new ControlPanel(), BorderLayout.EAST);
-        frame.pack();
 
+        frame.add(panel, BorderLayout.CENTER);
+        frame.pack();
+        acceleration = new AccelerationPanel();
+        frame.add(acceleration, BorderLayout.SOUTH);
+        frame.pack();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }

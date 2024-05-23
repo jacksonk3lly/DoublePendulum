@@ -4,7 +4,7 @@ import java.util.*;
 
 public class AccelerationPanel extends JPanel {
 
-    final int WIDTH = 700;
+    final int WIDTH = DoublePendulumn.frame.getWidth();
     final int HEIGHT = 200;
     final static int MEASURMENTS = 150;
     private static ArrayList<Integer> list1 = new ArrayList<Integer>();
@@ -29,16 +29,23 @@ public class AccelerationPanel extends JPanel {
         }
     }
 
-    private void plotList(ArrayList<Integer> list, Graphics g) {
+    private void plotList(ArrayList<Integer> list, Graphics g, float hue) {
+        float finalBrighness = 1f;
+        float brightness = 0f;
         for (int i = 1; i < MEASURMENTS; i++) {
             int step = WIDTH / MEASURMENTS;
             if (i < list.size()) {
                 if (list.get(i) != null && list.get(i - 1) != null) {
+                    g.setColor(Color.getHSBColor(hue, 1, brightness));
+                    if (i < MEASURMENTS / 9) {
+                        brightness += finalBrighness / (MEASURMENTS / 9);
+                    }
+                    if (i > MEASURMENTS - MEASURMENTS / 9) {
+                        brightness -= finalBrighness / (MEASURMENTS / 9);
+                    }
                     g.drawLine((i - 1) * step, 100 + list.get(i - 1), i * step, 100 + list.get(i));
 
                 }
-            } else {
-                list.add(null); // Add null value to the ArrayList
             }
         }
     }
@@ -46,9 +53,9 @@ public class AccelerationPanel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         g.setColor(Color.white);
-        plotList(list1, g);
+        plotList(list1, g, 0.5f);
         g.setColor(Color.pink);
-        plotList(list2, g);
+        plotList(list2, g, 0.8f);
     }
 
 }

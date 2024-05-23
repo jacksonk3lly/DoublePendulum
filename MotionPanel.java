@@ -11,9 +11,20 @@ public class MotionPanel extends JPanel {
     double prevTime;
 
     public MotionPanel() {
+        JLabel label = new JLabel(
+                "θ1'' =  \t−g (2 m1 + m2) sin θ1 − m2 g sin(θ1 − 2 θ2) − 2 sin(θ1 − θ2) m2 (θ2'2 L2 + θ1'2 L1 cos(θ1 − θ2))\n"
+                        + //
+                        "L1 (2 m1 + m2 − m2 cos(2 θ1 − 2 θ2))\n" + //
+                        "θ2'' =  \t2 sin(θ1 − θ2) (θ1'2 L1 (m1 + m2) + g(m1 + m2) cos θ1 + θ2'2 L2 m2 cos(θ1 − θ2))\n" + //
+                        "L2 (2 m1 + m2 − m2 cos(2 θ1 − 2 θ2))\n" + //
+                        "");
+        add(label);
+        label.setVisible(true);
+        label.setBackground(Color.white);
         setBackground(Color.black);
-        setPreferredSize(new Dimension(700, 700));
-        pendulumn = new Pendulumn(350, 350, Math.PI, Math.PI / 2, 0, 0, 150, 100, 10, 10, 0.5);
+        pendulumn = new Pendulumn(2 * Pendulumn.maxLength, 2 * Pendulumn.maxLength, Math.PI, Math.PI / 2, 0, 0, 100,
+                80, 10,
+                10, 0.5);
         // one second is 1000 milliseconds
         Timer timer = null;
         int wantedDelay = 1000 / fps;
@@ -43,6 +54,8 @@ public class MotionPanel extends JPanel {
                 }
             }
         });
+        int panelDimension = (int) (4 * (Pendulumn.maxLength));
+        setPreferredSize(new Dimension(panelDimension, panelDimension));
 
     }
 
