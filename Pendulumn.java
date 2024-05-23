@@ -1,11 +1,50 @@
 import java.lang.Math;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 
+/**
+ * The Pendulumn class represents a double pendulum system.
+ * It calculates the positions and movements of the pendulum bobs based on given
+ * parameters.
+ * The class also provides methods to set and retrieve the positions and
+ * velocities of the pendulum bobs.
+ * The pendulum system can be updated by calling the `step` method to simulate
+ * the passage of time.
+ * The class also provides a method to draw the pendulum system on a graphics
+ * object.
+ */
 public class Pendulumn {
-    double m1;
-    double m2;
+
+    /*
+     * Inner class to populate the trail queue
+     * takes a hue and cooridinates
+     */
+    private class TrailPoint {
+        int x;
+        int y;
+        float hue;
+        int width = 2;
+
+        public TrailPoint(int x, int y, float hue) {
+            this.x = x;
+            this.y = y;
+            this.hue = hue;
+        }
+    }
+
+    public Deque<TrailPoint> trail = new LinkedList<TrailPoint>();
+    int trailLength = 200;
+    boolean hasClicked = false;
+    double origionalShade = 50;
+    double shade = origionalShade;
+    int m1;
+    int m2;
     final int x0;
     final int y0;
     double x1;
@@ -29,7 +68,7 @@ public class Pendulumn {
     double paintC;
 
     public Pendulumn(int x0, int y0, double theta1, double theta2, double angularVelocity1, double angularVelocity2,
-            double l1, double l2, double m1, double m2, double dampening) {
+            double l1, double l2, int m1, int m2, double dampening) {
         this.x0 = x0;
         this.y0 = y0;
         this.theta1 = theta1;
@@ -73,8 +112,6 @@ public class Pendulumn {
      * 
      * https://www.youtube.com/watch?v=K8AfRtfwEdc
      * https://www.youtube.com/watch?v=PSlWb90JJx4
-     * 
-     * 
      */
     public boolean setBob2Potition(int xn, int yn) {
         // equation of line which cuts through the circles intersection
@@ -82,6 +119,11 @@ public class Pendulumn {
         double clickDistanceFrom0 = Math.sqrt(Math.pow(x0 - xn, 2) + Math.pow(y0 - yn, 2));
         if (clickDistanceFrom0 > l2 + l1)
             return false;
+        if (clickDistanceFrom0 < Math.abs(l2 - l1))
+            return false;
+        hasClicked = true;
+        shade = origionalShade;
+        trail.clear();
         double m = (double) (xn - x0) / (y0 - yn);
         double c = (x0 * x0 + y0 * y0 + l2 * l2 - (xn * xn + yn * yn + l1 * l1)) / (2 * (y0 - yn));
         double A = 1 + m * m;
@@ -90,7 +132,8 @@ public class Pendulumn {
 
         // bob one x position using quadratic formula
         // only need one solution so just take positive root
-        double X = (-B + Math.sqrt(B * B - 4 * A * C)) / (2 * A);
+        double posOrNeg = Math.random() < 0.5 ? -1 : 1;
+        double X = (-B + posOrNeg * Math.sqrt(B * B - 4 * A * C)) / (2 * A);
         double Y = m * X + c;
         paintbobX = X;
         paintbobY = Y;
@@ -103,9 +146,13 @@ public class Pendulumn {
         System.out.println("theta1: " + theta1);
         System.out.println("Oldtheta1: " + theta1);
         paintC = c;
-        theta1 = Math.asin((X - x0) / (l1));
-        if (X > x0)
-            theta1 = theta1 + Math.PI / 2;
+        theta1 = Math.atan((X - x0) / (Y - y0));
+        if (Y < y0)
+            theta1 += Math.PI;
+
+        theta2 = Math.atan((X - xn) / (Y - yn));
+        if (yn < Y)
+            theta2 += Math.PI;
         System.out.println("newTheta1: " + theta1);
         // theta2 = Math.atan((x2 - X) / (y2 - Y));
         return true;
@@ -125,17 +172,27 @@ public class Pendulumn {
     }
 
     public void step(double changeInTime) {
+        hue += 0.005f;
         double angularAcceleration1 = getAngularAcceleration1();
         double angularAcceleration2 = getAngularAcceleration2();
         angularVelocity1 += angularAcceleration1 * changeInTime * dampening;
         angularVelocity2 += angularAcceleration2 * changeInTime * dampening;
         theta1 += angularVelocity1 * changeInTime * dampening;
         theta2 += angularVelocity2 * changeInTime * dampening;
+        System.out.println("changed");
         AccelerationPanel.addValue1((int) (angularAcceleration1 * 150));
         AccelerationPanel.addValue2((int) (angularAcceleration2 * 150));
         DoublePendulumn.acceleration.repaint();
         refreshPositions();
-        hue += 0.01;
+        addToTrail((int) x2, (int) y2, hue);
+    }
+
+    private void addToTrail(int x, int y, float hue) {
+        TrailPoint point = new TrailPoint(x, y, hue);
+        trail.add(point);
+        if (trail.size() > trailLength) {
+            trail.remove();
+        }
     }
 
     private void refreshPositions() {
@@ -146,42 +203,6 @@ public class Pendulumn {
         y2 = y1 + l2 * Math.cos(theta2);
 
         // throw error if y2>l1+l2
-        if (Math.abs(y2 - y0) > l1 + l2) {
-            throw new IllegalArgumentException("y2 is " + (Math.abs(y2 - y0) - (l1 + l2)) + " greater than l1+l2");
-        } else if (Math.abs(y2 - y0) < l1 + l2) {
-            throw new IllegalArgumentException("y2 is " + ((l1 + l2) - Math.abs(y2 - y0)) + " greater than l1+l2");
-        }
-
-    }
-
-    public void setThetas(double x2, double y2) {
-        // theta2 = Math.asin(y2 / (Math.sqrt(Math.pow(x2, 2) + Math.pow(y2, 2))));
-        // theta2 = Math.PI;
-        // theta1 = Math.asin((x2 - x0 - l2 * Math.sin(theta2)) / l1);
-        // theta1 = Math.asin((x2 - x0 - l2 * Math.sin(theta2)) / l1);
-        // theta1 = Math.asin((x1 - x0) / l1);
-
-        double x = x2 - x0;
-        double y = y2 - y0;
-
-        double d = Math.sqrt(x * x + y * y);
-
-        double a = l1;
-        double c = l2;
-        double b = Math.sqrt(Math.pow((x2 - x0), 2) + Math.pow((y2 - y0), 2));
-
-        double A = Math.acos((a * a - b * b - c * c) / (-2 * b * c));
-        double C = Math.acos((c * c - a * a - b * b) / (-2 * a * b));
-        double L = Math.asin((y2 - y0) / b);
-
-        double w = Math.PI / 2 - L;
-        theta2 = Math.PI / 2 - A - w;
-
-        theta1 = C;
-
-        if (d > l1 + l2 || d < l1 - l2) {
-            return;
-        }
 
     }
 
@@ -192,20 +213,43 @@ public class Pendulumn {
      * 
      */
     public void draw(Graphics g) {
+        if (hasClicked) {
+            // tangent to two large circles's intersection
+            int xa = 0;
+            int xb = 900;
+            // grey
+            g.setColor(new Color((int) shade, (int) shade, (int) shade));
+            g.drawLine((int) xa, (int) (paintM * xa + paintC), (int) xb, (int) (paintM * xb + paintC));
+            // two large circles
+            g.drawOval((int) (paintClickX - l2), (int) (paintClickY - l2), (int) l2 * 2, (int) l2 * 2);
+            g.drawOval((int) (x0 - l1), (int) (y0 - l1), (int) l1 * 2, (int) l1 * 2);
+            // new bob1 prediction
+            // g.fillOval((int) paintbobX, (int) paintbobY, 10, 10);
+            shade -= .5;
+            if (shade < 0) {
+                shade = origionalShade;
+                hasClicked = false;
+            }
+
+        }
+        // trail
+        float trailBrightness = 0f;
+        float endBrightness = .6f;
+        for (TrailPoint point : trail) {
+            g.setColor(Color.getHSBColor(point.hue, .3f, trailBrightness));
+            g.fillOval(point.x, point.y, point.width, point.width);
+            trailBrightness += endBrightness / trail.size();
+        }
+        // pendulumn
         g.setColor(Color.getHSBColor(hue, 1f, 1f));
+        // l1
         g.drawLine((int) x0, (int) y0, (int) x1, (int) y1);
-        g.fillOval((int) x1 - 5, (int) y1 - 5, 10, 10);
+        // bob1
+        g.fillOval((int) x1 - m1 / 2, (int) y1 - m1 / 2, m1, m1);
+        // l2
         g.drawLine((int) x1, (int) y1, (int) x2, (int) y2);
-        g.fillOval((int) x2 - 5, (int) y2 - 5, 10, 10);
-        g.setColor(Color.red);
-        g.fillOval((int) paintbobX, (int) paintbobY, 10, 10);
-        g.setColor(Color.green);
-        g.drawOval((int) (x0 - l1), (int) (y0 - l1), (int) l1 * 2, (int) l1 * 2);
-        g.drawOval((int) (paintClickX - l2), (int) (paintClickY - l2), (int) l2 * 2, (int) l2 * 2);
-        g.setColor(Color.getHSBColor(hue, 1f, 1f));
-        int xa = 0;
-        int xb = 900;
-        g.drawLine((int) xa, (int) (paintM * xa + paintC), (int) xb, (int) (paintM * xb + paintC));
+        // bob2
+        g.fillOval((int) x2 - m2 / 2, (int) y2 - m2 / 2, (int) m2, (int) m2);
     }
 
     public double getAngularAcceleration1() {

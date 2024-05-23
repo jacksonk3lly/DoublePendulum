@@ -13,7 +13,7 @@ public class MotionPanel extends JPanel {
     public MotionPanel() {
         setBackground(Color.black);
         setPreferredSize(new Dimension(700, 700));
-        pendulumn = new Pendulumn(350, 350, Math.PI, Math.PI / 2, 0, 0, 150, 150, 10, 10, 0.5);
+        pendulumn = new Pendulumn(350, 350, Math.PI, Math.PI / 2, 0, 0, 150, 100, 10, 10, 0.5);
         // one second is 1000 milliseconds
         Timer timer = null;
         int wantedDelay = 1000 / fps;
