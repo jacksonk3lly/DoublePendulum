@@ -19,14 +19,12 @@ public class MotionPanel extends JPanel {
         int wantedDelay = 1000 / fps;
         timer = new Timer(wantedDelay - 2, e -> {
             double actualDelay = System.currentTimeMillis() - prevTime;
-            System.out.println((actualDelay) / 1000.0);
             prevTime = System.currentTimeMillis();
             repaint();
             if (actualDelay > 0.01) {
                 try {
                     pendulumn.step((wantedDelay * 7) / 1000.0);
                 } catch (Exception ex) {
-                    System.out.println("Error: " + ex.getMessage());
 
                 }
             }
@@ -39,9 +37,10 @@ public class MotionPanel extends JPanel {
                 int y2 = e.getY();
                 int x2 = e.getX();
 
-                pendulumn.setBob2Potition(x2, y2);
-                pendulumn.angularVelocity1 = 0;
-                pendulumn.angularVelocity2 = 0;
+                if (pendulumn.setBob2Potition(x2, y2)) {
+                    pendulumn.angularVelocity1 = 0;
+                    pendulumn.angularVelocity2 = 0;
+                }
             }
         });
 

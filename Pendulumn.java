@@ -42,7 +42,6 @@ public class Pendulumn {
         try {
             refreshPositions();
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
         }
     }
 
@@ -73,13 +72,17 @@ public class Pendulumn {
      * found thier intesection with help from this video
      * 
      * https://www.youtube.com/watch?v=K8AfRtfwEdc
+     * https://www.youtube.com/watch?v=PSlWb90JJx4
      * 
      * 
      */
-    public void setBob2Potition(int xn, int yn) {
+    public boolean setBob2Potition(int xn, int yn) {
         // equation of line which cuts through the circles intersection
 
-        double m = (xn - x0) / (y0 - yn);
+        double clickDistanceFrom0 = Math.sqrt(Math.pow(x0 - xn, 2) + Math.pow(y0 - yn, 2));
+        if (clickDistanceFrom0 > l2 + l1)
+            return false;
+        double m = (double) (xn - x0) / (y0 - yn);
         double c = (x0 * x0 + y0 * y0 + l2 * l2 - (xn * xn + yn * yn + l1 * l1)) / (2 * (y0 - yn));
         double A = 1 + m * m;
         double B = 2 * (m * (c - y0) - x0);
@@ -92,11 +95,20 @@ public class Pendulumn {
         paintbobX = X;
         paintbobY = Y;
         paintClickX = xn;
-        paintM = m;
-        paintC = c;
         paintClickY = yn;
-        theta1 = Math.atan((X - x0) / (Y - y0));
-        theta2 = Math.atan((x2 - X) / (y2 - Y));
+        paintM = m;
+        System.out.println("m: " + m);
+        System.out.println("yn: " + yn);
+        System.out.println("X: " + X);
+        System.out.println("theta1: " + theta1);
+        System.out.println("Oldtheta1: " + theta1);
+        paintC = c;
+        theta1 = Math.asin((X - x0) / (l1));
+        if (X > x0)
+            theta1 = theta1 + Math.PI / 2;
+        System.out.println("newTheta1: " + theta1);
+        // theta2 = Math.atan((x2 - X) / (y2 - Y));
+        return true;
     }
 
     public void setTheta2(double theta2) {
@@ -117,7 +129,6 @@ public class Pendulumn {
         double angularAcceleration2 = getAngularAcceleration2();
         angularVelocity1 += angularAcceleration1 * changeInTime * dampening;
         angularVelocity2 += angularAcceleration2 * changeInTime * dampening;
-        System.out.println("angularVelocity1 " + angularVelocity1 + " angularVelocity2 " + angularVelocity2);
         theta1 += angularVelocity1 * changeInTime * dampening;
         theta2 += angularVelocity2 * changeInTime * dampening;
         AccelerationPanel.addValue1((int) (angularAcceleration1 * 150));
@@ -134,7 +145,6 @@ public class Pendulumn {
         x2 = x1 + l2 * Math.sin(theta2);
         y2 = y1 + l2 * Math.cos(theta2);
 
-        System.out.println("theta1 " + theta1 / Math.PI + " PI" + " theta2 " + theta2 / Math.PI + " PI");
         // throw error if y2>l1+l2
         if (Math.abs(y2 - y0) > l1 + l2) {
             throw new IllegalArgumentException("y2 is " + (Math.abs(y2 - y0) - (l1 + l2)) + " greater than l1+l2");
@@ -170,7 +180,6 @@ public class Pendulumn {
         theta1 = C;
 
         if (d > l1 + l2 || d < l1 - l2) {
-            System.out.println("d is " + d + " l1+l2 is " + (l1 + l2));
             return;
         }
 
@@ -196,7 +205,7 @@ public class Pendulumn {
         g.setColor(Color.getHSBColor(hue, 1f, 1f));
         int xa = 0;
         int xb = 900;
-        g.drawLine((int) xa, (int) paintM * xa + (int) paintC, (int) xb, (int) paintM * xb + (int) paintC);
+        g.drawLine((int) xa, (int) (paintM * xa + paintC), (int) xb, (int) (paintM * xb + paintC));
     }
 
     public double getAngularAcceleration1() {
